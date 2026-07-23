@@ -1,0 +1,101 @@
+{
+  "schema_version": "shorts-studio-virality-v1",
+  "source_filter": {
+    "minimum_score": 0.44,
+    "minimum_speech_coverage": 0.08,
+    "semantic_core_sentences": 12,
+    "weights": {
+      "metadata": 0.16,
+      "semantic_density": 0.28,
+      "reaction_density": 0.20,
+      "topic_specificity": 0.16,
+      "speech_coverage": 0.12,
+      "lexical_novelty": 0.08
+    },
+    "penalties": {
+      "advertisement_or_outro": 0.18,
+      "context_debt": 0.12
+    }
+  },
+  "candidate_generation": {
+    "length_seconds": {
+      "min": 18,
+      "target": [24, 45],
+      "max": 52
+    },
+    "hook_window_seconds": [0, 2.5],
+    "payoff_window_seconds": [6, 38],
+    "natural_end": {
+      "silence_ms": 450,
+      "search_ahead_seconds": 8,
+      "discard_if_unresolved": true
+    },
+    "deduplication": {
+      "max_temporal_overlap": 0.35,
+      "max_semantic_similarity": 0.82
+    }
+  },
+  "channel_watcher": {
+    "enabled": true,
+    "channel_url": "https://www.youtube.com/@example/videos",
+    "poll_interval_seconds": 1800,
+    "lookback_videos": 12,
+    "max_videos_per_cycle": 1,
+    "minimum_metadata_score": 0.2,
+    "browser": "edge",
+    "process_latest_on_first_run": true
+  },
+  "portfolio": {
+    "clips_per_source": {
+      "rejected": 0,
+      "ordinary": 3,
+      "strong": 5,
+      "exceptional": 6
+    },
+    "strong_threshold": 0.56,
+    "exceptional_threshold": 0.7,
+    "maximum_clips_from_one_source_per_day": 2
+  },
+  "scoring": {
+    "hook": 0.24,
+    "payoff": 0.20,
+    "completeness": 0.16,
+    "streamer_reaction": 0.12,
+    "audio_contrast": 0.10,
+    "visual_progression": 0.08,
+    "novelty": 0.06,
+    "boundary_quality": 0.04,
+    "penalties": {
+      "cutoff_penalty": 0.28,
+      "context_debt": 0.12,
+      "ad_or_outro": 0.10
+    }
+  },
+  "metadata": {
+    "title_length": [45, 75],
+    "brand_tags": ["jesusavgn", "hesusavgn", "хесус"],
+    "topic_tag_count": [1, 2],
+    "format_tag_count": [0, 1],
+    "max_tags": 6
+  },
+  "scheduler": {
+    "model": "contextual_thompson_sampling",
+    "timezone": "Asia/Tbilisi",
+    "minimum_posts_per_day": 4,
+    "maximum_posts_per_day": 7,
+    "minimum_gap_minutes": 150,
+    "allowed_window_start": "10:00",
+    "allowed_window_end": "23:00",
+    "exploration_rate": 0.2,
+    "exploit_slots": ["10:00", "15:00", "20:00"],
+    "explore_slots": ["12:30", "22:30"],
+    "prevent_adjacent_topic_duplicates": true,
+    "reward_weights": {
+      "completion_rate": 0.35,
+      "average_watch_ratio": 0.25,
+      "share_rate": 0.20,
+      "comment_rate": 0.10,
+      "view_velocity_6h": 0.10
+    }
+  }
+}

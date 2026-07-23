@@ -1,0 +1,41 @@
+[project]
+name = "shorts-studio-backend"
+version = "0.1.0"
+description = "Local-first long-video to vertical-shorts pipeline"
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi==0.115.12",
+  "uvicorn[standard]==0.34.2",
+  "python-multipart==0.0.20",
+  "pydantic-settings==2.9.1",
+  "sqlalchemy==2.0.41",
+  "psycopg[binary]==3.2.9",
+  "celery[redis]==5.5.2",
+  "structlog==25.3.0",
+  "httpx==0.28.1",
+  "requests==2.32.5",
+  "cryptography==45.0.3",
+  "opencv-python-headless==4.11.0.86",
+  "scenedetect==0.6.6",
+  "faster-whisper==1.1.1",
+  "fastembed==0.8.0",
+  "yt-dlp==2026.6.9",
+]
+
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+[project.optional-dependencies]
+dev = ["pytest==8.3.5", "pytest-cov==6.1.1", "ruff==0.11.11"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"

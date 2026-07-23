@@ -1,0 +1,82 @@
+name: shorts-studio
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: shorts
+      POSTGRES_USER: shorts
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-local-development-only}
+    volumes: [postgres_data:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U shorts -d shorts"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7.4-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes: [redis_data:/data]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build: ./backend
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://shorts:${POSTGRES_PASSWORD:-local-development-only}@postgres:5432/shorts
+      REDIS_URL: redis://redis:6379/0
+      STORAGE_ROOT: /data
+    volumes: [media_data:/data, model_cache:/root/.cache/huggingface]
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+
+  worker:
+    build: ./backend
+    command: ["celery", "-A", "app.tasks:celery_app", "worker", "--loglevel=INFO", "--concurrency=1"]
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://shorts:${POSTGRES_PASSWORD:-local-development-only}@postgres:5432/shorts
+      REDIS_URL: redis://redis:6379/0
+      STORAGE_ROOT: /data
+    volumes: [media_data:/data, model_cache:/root/.cache/huggingface]
+    depends_on:
+      api: { condition: service_healthy }
+    restart: unless-stopped
+
+  beat:
+    build: ./backend
+    command: ["celery", "-A", "app.tasks:celery_app", "beat", "--loglevel=INFO"]
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://shorts:${POSTGRES_PASSWORD:-local-development-only}@postgres:5432/shorts
+      REDIS_URL: redis://redis:6379/0
+      STORAGE_ROOT: /data
+    volumes: [media_data:/data]
+    depends_on:
+      api: { condition: service_healthy }
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    ports: ["3000:80"]
+    depends_on:
+      api: { condition: service_healthy }
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  media_data:
+  model_cache:
+

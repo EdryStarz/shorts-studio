@@ -1,0 +1,2 @@
+"""Shorts Studio backend."""
+
